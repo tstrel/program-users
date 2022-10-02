@@ -95,12 +95,16 @@ func (s *Store) Users() ([]User, error) {
 }
 
 func (s *Store) UserById(userId int64) (*User, error) {
-	row := s.db.QueryRow("SELECT * FROM users WHERE id=$1", userId)
+	return s.getUserBy("id=$1", userId)
+}
+
+func (s *Store) getUserBy(where string, field interface{}) (*User, error) {
+	row := s.db.QueryRow(fmt.Sprintf("SELECT * FROM users WHERE %s", where), field)
 
 	var user User
 	switch err := row.Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt); err {
 	case sql.ErrNoRows:
-		return nil, fmt.Errorf("user with id: %d not found", userId)
+		return nil, fmt.Errorf("user not found")
 	case nil:
 		return &user, nil
 	default:
@@ -108,8 +112,8 @@ func (s *Store) UserById(userId int64) (*User, error) {
 	}
 }
 
-func (s *Store) UserByName(userId int64) (*User, error) {
-	return nil, nil
+func (s *Store) UserByName(Username string) (*User, error) {
+	return s.getUserBy("username=$1", Username)
 }
 
 func (s *Store) Close() error {

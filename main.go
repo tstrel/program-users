@@ -12,14 +12,6 @@ func main() {
 	store := database.GetStore()
 	defer store.Close()
 
-	/*
-		home page "/"
-		- if user not logged show 2 links: loging or signup
-		- if user present show message: hello Username
-	*/
-	// login page "/login"
-	// register page "/register"
-
 	http.HandleFunc("/", handlers.HomeHandler)
 	http.HandleFunc("/register/", handlers.RegisterHandler)
 
