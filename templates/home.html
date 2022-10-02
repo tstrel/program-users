@@ -1,10 +1,13 @@
 <h1>Home Page</h1>
 
 {{if .Data}}
-  Logged in {{.Data.Username}}
-
-  <a href="/users">Login</a>
+<div> Logged in {{.Data.Username}}</div>
+ <div>
+  <a href="/users">users</a>
+  <a href="/logout">Logout</a>
+</div>
 {{else}}
   <a href="/login">Login</a>
   <a href="/register">Register</a>
+
 {{end}}

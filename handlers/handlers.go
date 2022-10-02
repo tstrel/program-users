@@ -32,6 +32,10 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
+	if currentUserId != nil {
+		http.Redirect(w, r, "/", http.StatusFound)
+	}
+
 	if r.Method == http.MethodGet {
 		templates.RenderTemplate(w, "register", nil)
 		return
@@ -46,8 +50,8 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	store := database.GetStore()
 
-	// u, err := store.UserByName(1)
-	if true { // if user exists
+	user, _ := store.UserByName(username)
+	if user != nil {
 		templates.RenderTemplate(w, "register", "such user already exists")
 		return
 	}
@@ -60,5 +64,10 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	currentUserId = &userId
 
+	http.Redirect(w, r, "/", http.StatusFound)
+}
+
+func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	currentUserId = nil
 	http.Redirect(w, r, "/", http.StatusFound)
 }
