@@ -1,8 +1,10 @@
 <h1>Home Page</h1>
-<form action="/register/" method="POST">
-    <label>Name:</label><br />
-    <input type="text" name="username"><br />
-    <label>Password:</label><br />
-    <input type="text" name="password"><br />
-    <input type="Sign Up">
-</form>
+
+{{if .Data}}
+  Logged in {{.Data.Username}}
+
+  <a href="/users">Login</a>
+{{else}}
+  <a href="/login">Login</a>
+  <a href="/register">Register</a>
+{{end}}

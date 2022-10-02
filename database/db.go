@@ -108,6 +108,10 @@ func (s *Store) UserById(userId int64) (*User, error) {
 	}
 }
 
+func (s *Store) UserByName(userId int64) (*User, error) {
+	return nil, nil
+}
+
 func (s *Store) Close() error {
 	return s.db.Close()
 }

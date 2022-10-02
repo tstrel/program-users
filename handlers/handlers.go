@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"example.com/program/database"
@@ -10,6 +11,12 @@ import (
 var currentUserId *int64
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprint(w, "Not found")
+		return
+	}
+
 	var (
 		user *database.User
 		err  error
@@ -25,13 +32,27 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
-	templates.RenderTemplate(w, "register", nil)
-}
+	if r.Method == http.MethodGet {
+		templates.RenderTemplate(w, "register", nil)
+		return
+	}
 
-func SaveRegistration(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "bad request", http.StatusNotFound)
+	}
+
 	username := r.FormValue("username")
 	password := r.FormValue("password")
-	userId, err := database.GetStore().CreateUser(username, password)
+
+	store := database.GetStore()
+
+	// u, err := store.UserByName(1)
+	if true { // if user exists
+		templates.RenderTemplate(w, "register", "such user already exists")
+		return
+	}
+
+	userId, err := store.CreateUser(username, password)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -20,11 +20,10 @@ func main() {
 	// login page "/login"
 	// register page "/register"
 
-	http.HandleFunc("/", handlers.MakeHandler(handlers.HomeHandler))
-	http.HandleFunc("/register/", handlers.MakeHandler(handlers.RegisterHandler))
-	// http.HandleFunc("/view/", handlers.MakeHandler(handlers.ViewHandler))
-	// http.HandleFunc("/edit/", handlers.MakeHandler(handlers.EditHandler))
-	// http.HandleFunc("/save/", handlers.MakeHandler(handlers.SaveHandler))
+	http.HandleFunc("/", handlers.HomeHandler)
+	http.HandleFunc("/register/", handlers.RegisterHandler)
+
+	log.Println("starting server at: http://localhost")
 
 	log.Fatal(http.ListenAndServe(":80", nil))
 }
