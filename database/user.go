@@ -8,3 +8,7 @@ type User struct {
 	Password  string
 	CreatedAt time.Time
 }
+
+func (u User) FormattedTime() string {
+	return u.CreatedAt.Format(time.RFC1123)
+}

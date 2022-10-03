@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -136,20 +135,20 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 func ViewUsersHandler(w http.ResponseWriter, r *http.Request) {
 	users, _ := database.GetStore().Users()
-	// content, _ := json.Marshal(users)
-	// fmt.Fprint(w, string(content))
 
-	enc := json.NewEncoder(w)
-	enc.SetIndent("", "  ")
-	enc.Encode(users)
+	// enc := json.NewEncoder(w)
+	// enc.SetIndent("", "  ")
+	// enc.Encode(users)   for export users
+
+	templates.RenderTemplate(w, "users", users)
 }
 
 func ValidatePassword(password string) error {
 	if len(password) <= 5 {
-		return fmt.Errorf("password cannot be less than six characters")
+		return fmt.Errorf("password cannot be less than 6 characters")
 	}
 	if len(password) > 16 {
-		return fmt.Errorf("password cannot be more than sixteen characters")
+		return fmt.Errorf("password cannot be more than 16 characters")
 	}
 
 	if strings.Contains(password, " ") {
@@ -162,11 +161,11 @@ func ValidatePassword(password string) error {
 var userNameRegExp = regexp.MustCompile("[^A-Za-z0-9]")
 
 func ValidateUsername(username string) error {
-	if len(username) <= 5 {
-		return fmt.Errorf("username cannot be less than six characters")
+	if len(username) <= 2 {
+		return fmt.Errorf("username cannot be less than 3 characters")
 	}
 	if len(username) > 16 {
-		return fmt.Errorf("username cannot be more than sixteen characters")
+		return fmt.Errorf("username cannot be more than 16 characters")
 	}
 
 	if userNameRegExp.MatchString(username) {

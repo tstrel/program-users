@@ -8,7 +8,8 @@ import (
 var parsedTemplates = template.Must(template.ParseFiles(
 	"templates/home.html",
 	"templates/register.html",
-	"templates/login.html"))
+	"templates/login.html",
+	"templates/users.html"))
 
 type PageData struct {
 	Data interface{}

@@ -1,0 +1,47 @@
+<h1>Users</h1>
+
+<style>
+    table,
+    th,
+    td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+
+    table td, table th {
+        padding: 5px;
+    }
+
+    table td {
+        font-weight: bold;
+    }
+
+    .uid {
+        width: 30px;
+    }
+
+    .username {
+        width: 100px;
+    }
+</style>
+
+<table>
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Username</th>
+            <th>Created At</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{range .Data}}
+        <tr>
+            <td class="uid">{{.Id}}</td>
+            <td class="username">
+                <a href="/users/{{.Id}}/edit">{{.Username}}</a>
+            </td>
+            <td>{{.FormattedTime}}</td>
+        </tr>
+        {{end}}
+    </tbody>
+</table>
