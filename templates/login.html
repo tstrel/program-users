@@ -1,0 +1,13 @@
+<h1>Login</h1>
+
+{{if .Data}}
+<div>Error happened: {{.Data}}</div>
+{{end}}
+
+<form action="/login/" method="POST">
+    <label>Name:</label><br />
+    <input type="text" name="username"><br />
+    <label>Password:</label><br />
+    <input type="text" name="password"><br />
+    <input type="submit">
+</form>

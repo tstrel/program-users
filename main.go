@@ -14,7 +14,8 @@ func main() {
 
 	http.HandleFunc("/", handlers.HomeHandler)
 	http.HandleFunc("/register/", handlers.RegisterHandler)
-	http.HandleFunc("/logout", handlers.LogoutHandler)
+	http.HandleFunc("/login/", handlers.LoginHandler)
+	http.HandleFunc("/logout/", handlers.LogoutHandler)
 
 	log.Println("starting server at: http://localhost")
 
