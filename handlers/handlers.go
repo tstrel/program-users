@@ -248,13 +248,43 @@ func EditUserHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
-	err = database.GetStore().EditUser(username, password, *user.Id)
-	if err == nil {
-		// redirect to users list
-		http.Redirect(w, r, "/users", http.StatusFound)
+	err = ValidateUsername(username)
+	if err != nil {
+		templates.RenderTemplate(w, "edit", struct {
+			User         *database.User
+			ErrorMessage *string
+		}{
+			User:         user,
+			ErrorMessage: ErrorMessage(err),
+		})
+		return
 	}
 
-	// render form with error
+	err = ValidatePassword(password)
+	if err != nil {
+		templates.RenderTemplate(w, "edit", struct {
+			User         *database.User
+			ErrorMessage *string
+		}{
+			User:         user,
+			ErrorMessage: ErrorMessage(err),
+		})
+		return
+	}
+
+	err = database.GetStore().EditUser(username, password, *user.Id)
+	if err == nil {
+		http.Redirect(w, r, "/users", http.StatusFound)
+	} else {
+		templates.RenderTemplate(w, "edit", struct {
+			User         *database.User
+			ErrorMessage *string
+		}{
+			User:         user,
+			ErrorMessage: nil,
+		})
+	}
+
 }
 
 func RequireAuthMiddleware(h http.HandlerFunc) http.HandlerFunc {
@@ -266,4 +296,12 @@ func RequireAuthMiddleware(h http.HandlerFunc) http.HandlerFunc {
 
 		h(w, r)
 	}
+}
+
+func ErrorMessage(err error) *string {
+	if err == nil {
+		return nil
+	}
+	errMsg := err.Error()
+	return &errMsg
 }
