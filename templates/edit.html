@@ -1,0 +1,13 @@
+<h1>Edit User</h1>
+
+{{if .Data.ErrorMessage}}
+<div>Error happened: {{.Data.ErrorMessage}}</div> 
+{{end}}
+
+<form action="/users/edit?user_id={{.Data.User.Id}}" method="POST">
+    <label>Name:</label><br />
+    <input type="text" name="username" value="{{.Data.User.Username}}"><br/>
+    <label>Password:</label><br />
+    <input type="text" name="password" value="{{.Data.User.Password}}"><br />
+    <input type="submit">
+</form>

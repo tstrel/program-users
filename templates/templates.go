@@ -9,7 +9,8 @@ var parsedTemplates = template.Must(template.ParseFiles(
 	"templates/home.html",
 	"templates/register.html",
 	"templates/login.html",
-	"templates/users.html"))
+	"templates/users.html",
+	"templates/edit.html"))
 
 type PageData struct {
 	Data interface{}

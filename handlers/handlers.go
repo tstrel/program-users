@@ -3,7 +3,9 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"example.com/program/database"
@@ -134,13 +136,27 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ViewUsersHandler(w http.ResponseWriter, r *http.Request) {
+
 	users, _ := database.GetStore().Users()
 
 	// enc := json.NewEncoder(w)
 	// enc.SetIndent("", "  ")
 	// enc.Encode(users)   for export users
 
-	templates.RenderTemplate(w, "users", users)
+	var msg *string
+
+	msgParam := r.URL.Query().Get("msg")
+	if msgParam != "" {
+		msg = &msgParam
+	}
+
+	templates.RenderTemplate(w, "users", struct {
+		Users        []database.User
+		ErrorMessage *string
+	}{
+		Users:        users,
+		ErrorMessage: msg,
+	})
 }
 
 func ValidatePassword(password string) error {
@@ -173,4 +189,81 @@ func ValidateUsername(username string) error {
 	}
 
 	return nil
+}
+
+func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	userIdStr := q.Get("user_id")
+
+	userId, err := strconv.ParseInt(userIdStr, 10, 64)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	if userId == *currentUserId {
+		msg := "You could not delete yourself"
+
+		q := url.Values{}
+		q.Add("msg", msg)
+
+		http.Redirect(w, r, fmt.Sprintf("/users?%s", q.Encode()), http.StatusFound)
+		return
+	}
+
+	if err := database.GetStore().DeleteUser(userId); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	http.Redirect(w, r, "/users", http.StatusFound)
+}
+
+func EditUserHandler(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	userIdStr := q.Get("user_id")
+
+	userId, err := strconv.ParseInt(userIdStr, 10, 64)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	user, err := database.GetStore().UserById(userId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	if r.Method == http.MethodGet {
+		templates.RenderTemplate(w, "edit", struct {
+			User         *database.User
+			ErrorMessage *string
+		}{
+			User:         user,
+			ErrorMessage: nil,
+		})
+		return
+	}
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "bad request", http.StatusNotFound)
+	}
+
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+
+	err = database.GetStore().EditUser(username, password, *user.Id)
+	if err == nil {
+		// redirect to users list
+		http.Redirect(w, r, "/users", http.StatusFound)
+	}
+
+	// render form with error
+}
+
+func RequireAuthMiddleware(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if !IsUserLoggedIn() {
+			http.Redirect(w, r, "/", http.StatusFound)
+			return
+		}
+
+		h(w, r)
+	}
 }

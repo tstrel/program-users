@@ -25,6 +25,10 @@
     }
 </style>
 
+{{if .Data.ErrorMessage}}
+<div>Error happened: {{.Data.ErrorMessage}}</div> 
+{{end}}
+
 <table>
     <thead>
         <tr>
@@ -34,13 +38,13 @@
         </tr>
     </thead>
     <tbody>
-        {{range .Data}}
+        {{range .Data.Users}}
         <tr>
             <td class="uid">{{.Id}}</td>
-            <td class="username">
-                <a href="/users/{{.Id}}/edit">{{.Username}}</a>
-            </td>
+            <td class="username">{{.Username}} </td>
             <td>{{.FormattedTime}}</td>
+            <td><a href="/users/edit?user_id={{.Id}}">edit</a></td>
+            <td><a href="/users/delete?user_id={{.Id}}">delete</a></td>
         </tr>
         {{end}}
     </tbody>

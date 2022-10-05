@@ -72,6 +72,16 @@ func (s *Store) CreateUser(username, password string) (int64, error) {
 	return res.LastInsertId()
 }
 
+func (s *Store) DeleteUser(Id int64) error {
+	_, err := s.db.Exec(`DELETE FROM users WHERE id = ?`, Id)
+	return err
+}
+
+func (s *Store) EditUser(username string, password string, Id int64) error {
+	_, err := s.db.Exec(`UPDATE users SET username = ?, password = ? WHERE id = ?`, username, password, Id)
+	return err
+}
+
 func (s *Store) Users() ([]User, error) {
 	rows, err := s.db.Query("SELECT * FROM users")
 	if err != nil {
