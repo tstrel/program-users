@@ -17,8 +17,14 @@ func main() {
 	http.HandleFunc("/login/", handlers.LoginHandler)
 	http.HandleFunc("/logout/", handlers.LogoutHandler)
 	http.HandleFunc("/users/", handlers.RequireAuthMiddleware(handlers.ViewUsersHandler))
-	http.HandleFunc("/users/delete", handlers.RequireAuthMiddleware(handlers.DeleteUserHandler))
-	http.HandleFunc("/users/edit", handlers.RequireAuthMiddleware(handlers.EditUserHandler))
+
+	http.HandleFunc("/users/delete", handlers.RequireAuthMiddleware(
+		handlers.RequireAdminMiddleware(handlers.DeleteUserHandler),
+	))
+
+	http.HandleFunc("/users/edit", handlers.RequireAuthMiddleware(
+		handlers.RequireAdminMiddleware(handlers.EditUserHandler),
+	))
 	log.Println("starting server at: http://localhost")
 
 	log.Fatal(http.ListenAndServe(":80", nil))

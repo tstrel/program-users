@@ -43,8 +43,13 @@
             <td class="uid">{{.Id}}</td>
             <td class="username">{{.Username}} </td>
             <td>{{.FormattedTime}}</td>
+            {{if $.Data.IsAdmin}}
             <td><a href="/users/edit?user_id={{.Id}}">edit</a></td>
             <td><a href="/users/delete?user_id={{.Id}}">delete</a></td>
+            {{else}}
+            <td></td>
+            <td></td>
+            {{end}}
         </tr>
         {{end}}
     </tbody>

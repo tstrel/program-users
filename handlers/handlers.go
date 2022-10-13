@@ -63,6 +63,12 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	username := r.FormValue("username")
 	password := r.FormValue("password")
+	adminRight := r.FormValue("adminRight")
+
+	var isAdmin bool
+	if adminRight == "is_admin" {
+		isAdmin = true
+	}
 
 	err := ValidateUsername(username)
 	if err != nil {
@@ -84,7 +90,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userId, err := store.CreateUser(username, password)
+	userId, err := store.CreateUser(username, password, isAdmin)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -136,12 +142,9 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ViewUsersHandler(w http.ResponseWriter, r *http.Request) {
+	user, _ := database.GetStore().UserById(*currentUserId)
 
 	users, _ := database.GetStore().Users()
-
-	// enc := json.NewEncoder(w)
-	// enc.SetIndent("", "  ")
-	// enc.Encode(users)   for export users
 
 	var msg *string
 
@@ -153,9 +156,11 @@ func ViewUsersHandler(w http.ResponseWriter, r *http.Request) {
 	templates.RenderTemplate(w, "users", struct {
 		Users        []database.User
 		ErrorMessage *string
+		IsAdmin      bool
 	}{
 		Users:        users,
 		ErrorMessage: msg,
+		IsAdmin:      user.IsAdmin,
 	})
 }
 
@@ -292,6 +297,17 @@ func RequireAuthMiddleware(h http.HandlerFunc) http.HandlerFunc {
 		if !IsUserLoggedIn() {
 			http.Redirect(w, r, "/", http.StatusFound)
 			return
+		}
+
+		h(w, r)
+	}
+}
+
+func RequireAdminMiddleware(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user, _ := database.GetStore().UserById(*currentUserId)
+		if !user.IsAdmin {
+			http.Redirect(w, r, "/users", http.StatusFound)
 		}
 
 		h(w, r)

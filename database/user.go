@@ -7,6 +7,7 @@ type User struct {
 	Username  string
 	Password  string
 	CreatedAt time.Time
+	IsAdmin   bool
 }
 
 func (u User) FormattedTime() string {

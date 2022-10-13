@@ -15,7 +15,8 @@ const (
         id INTEGER PRIMARY KEY,
         username TEXT NOT NULL,
         password TEXT NOT NULL,
-        created_at DATETIME
+        created_at DATETIME,
+		is_admin bool
     );`
 )
 
@@ -57,12 +58,12 @@ func newStore() (*Store, error) {
 	return &Store{db}, nil
 }
 
-func (s *Store) CreateUser(username, password string) (int64, error) {
+func (s *Store) CreateUser(username string, password string, isAdmin bool) (int64, error) {
 	createdAt := time.Now()
 
 	res, err := s.db.Exec(
-		`INSERT INTO users (username, password, created_at) VALUES (?, ?, ?)`,
-		username, password, createdAt,
+		`INSERT INTO users (username, password, created_at, is_admin) VALUES (?, ?, ?, ?)`,
+		username, password, createdAt, isAdmin,
 	)
 
 	if err != nil {
@@ -92,7 +93,7 @@ func (s *Store) Users() ([]User, error) {
 
 	for rows.Next() {
 		var u User
-		err := rows.Scan(&u.Id, &u.Username, &u.Password, &u.CreatedAt)
+		err := rows.Scan(&u.Id, &u.Username, &u.Password, &u.CreatedAt, &u.IsAdmin)
 		if err != nil {
 			return nil, err
 		}
@@ -112,7 +113,7 @@ func (s *Store) getUserBy(where string, field interface{}) (*User, error) {
 	row := s.db.QueryRow(fmt.Sprintf("SELECT * FROM users WHERE %s", where), field)
 
 	var user User
-	switch err := row.Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt); err {
+	switch err := row.Scan(&user.Id, &user.Username, &user.Password, &user.CreatedAt, &user.IsAdmin); err {
 	case sql.ErrNoRows:
 		return nil, fmt.Errorf("user not found")
 	case nil:
