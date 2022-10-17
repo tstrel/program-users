@@ -6,26 +6,30 @@ import (
 
 	"example.com/program/database"
 	"example.com/program/handlers"
+	"github.com/gorilla/mux"
 )
 
 func main() {
 	store := database.GetStore()
 	defer store.Close()
 
-	http.HandleFunc("/", handlers.HomeHandler)
-	http.HandleFunc("/register/", handlers.RegisterHandler)
-	http.HandleFunc("/login/", handlers.LoginHandler)
-	http.HandleFunc("/logout/", handlers.LogoutHandler)
-	http.HandleFunc("/users/", handlers.RequireAuthMiddleware(handlers.ViewUsersHandler))
+	r := mux.NewRouter()
 
-	http.HandleFunc("/users/delete", handlers.RequireAuthMiddleware(
-		handlers.RequireAdminMiddleware(handlers.DeleteUserHandler),
-	))
+	r.HandleFunc("/", handlers.HomeHandler)
+	r.HandleFunc("/register", handlers.RegisterHandler)
+	r.HandleFunc("/login", handlers.LoginHandler)
+	r.HandleFunc("/logout", handlers.LogoutHandler)
 
-	http.HandleFunc("/users/edit", handlers.RequireAuthMiddleware(
-		handlers.RequireAdminMiddleware(handlers.EditUserHandler),
-	))
+	withAuth := r.NewRoute().Subrouter()
+	withAuth.Use(handlers.RequireAuthMiddleware)
+
+	withAuth.HandleFunc("/users", handlers.ViewUsersHandler)
+
+	withAuth.HandleFunc("/users/delete", handlers.RequireAdminMiddleware(handlers.DeleteUserHandler))
+
+	withAuth.HandleFunc("/users/edit", handlers.RequireAdminMiddleware(handlers.EditUserHandler))
+
 	log.Println("starting server at: http://localhost")
 
-	log.Fatal(http.ListenAndServe(":80", nil))
+	log.Fatal(http.ListenAndServe(":80", r))
 }

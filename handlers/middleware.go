@@ -6,15 +6,15 @@ import (
 	"example.com/program/database"
 )
 
-func RequireAuthMiddleware(h http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func RequireAuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !IsUserLoggedIn(r) {
 			http.Redirect(w, r, "/", http.StatusUnauthorized)
 			return
 		}
 
-		h(w, r)
-	}
+		next.ServeHTTP(w, r)
+	})
 }
 
 func RequireAdminMiddleware(h http.HandlerFunc) http.HandlerFunc {
