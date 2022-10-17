@@ -17,6 +17,9 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
+	currentUserId := CurrentUserId(r)
+
 	if userId == *currentUserId {
 		msg := "You could not delete yourself"
 

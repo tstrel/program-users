@@ -8,6 +8,7 @@ import (
 )
 
 func ViewUsersHandler(w http.ResponseWriter, r *http.Request) {
+	currentUserId := CurrentUserId(r)
 	user, _ := database.GetStore().UserById(*currentUserId)
 
 	users, _ := database.GetStore().Users()

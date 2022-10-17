@@ -37,7 +37,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	SetLoggedInUserID(*user.Id)
+	SetLoggedInUserID(w, r, *user.Id)
 
 	http.Redirect(w, r, "/", http.StatusFound)
 }

@@ -20,6 +20,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		err  error
 	)
 	if IsUserLoggedIn(r) {
+		currentUserId := CurrentUserId(r)
 		user, err = database.GetStore().UserById(*currentUserId)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

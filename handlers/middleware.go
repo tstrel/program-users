@@ -9,7 +9,7 @@ import (
 func RequireAuthMiddleware(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if !IsUserLoggedIn(r) {
-			http.Redirect(w, r, "/", http.StatusFound)
+			http.Redirect(w, r, "/", http.StatusUnauthorized)
 			return
 		}
 
@@ -19,6 +19,7 @@ func RequireAuthMiddleware(h http.HandlerFunc) http.HandlerFunc {
 
 func RequireAdminMiddleware(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		currentUserId := CurrentUserId(r)
 		user, _ := database.GetStore().UserById(*currentUserId)
 		if !user.IsAdmin {
 			http.Redirect(w, r, "/users", http.StatusFound)

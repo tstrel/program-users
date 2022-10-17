@@ -56,7 +56,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	SetLoggedInUserID(userId)
+	SetLoggedInUserID(w, r, userId)
 
 	http.Redirect(w, r, "/", http.StatusFound)
 }
