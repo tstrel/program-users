@@ -46,9 +46,9 @@ func registerApiHandlers(r *mux.Router) {
 		fmt.Fprintf(w, `{"status":"ok"}`)
 	})
 
-	apiRouter.Path("/users/").Methods("GET").HandlerFunc(api.UsersHandler) // list users
-	apiRouter.Path("/users").Methods("POST")                               // create user
-	apiRouter.Path("/users/{id}").Methods("GET")                           // get user
-	apiRouter.Path("/users/{id}").Methods("PUT")                           // update user
-	apiRouter.Path("/users/{id}").Methods("DELETE")                        // delete user
+	apiRouter.Path("/users").Methods("GET").HandlerFunc(api.UsersHandler)              // list users
+	apiRouter.Path("/users").Methods("POST").HandlerFunc(api.CreateUserHandler)        // create user
+	apiRouter.Path("/users/{id}").Methods("GET").HandlerFunc(api.GetUserHandler)       // get user
+	apiRouter.Path("/users/{id}").Methods("PUT").HandlerFunc(api.UpdateUserHandler)    // update user
+	apiRouter.Path("/users/{id}").Methods("DELETE").HandlerFunc(api.DeleteUserHandler) // delete user
 }

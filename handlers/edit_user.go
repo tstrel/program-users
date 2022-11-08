@@ -6,6 +6,7 @@ import (
 
 	"example.com/program/database"
 	"example.com/program/templates"
+	"example.com/program/validation"
 )
 
 func EditUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -40,7 +41,7 @@ func EditUserHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
-	err = ValidateUsername(username)
+	err = validation.ValidateUsername(username)
 	if err != nil {
 		templates.RenderTemplate(w, "edit", struct {
 			User         *database.User
@@ -52,7 +53,7 @@ func EditUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = ValidatePassword(password)
+	err = validation.ValidatePassword(password)
 	if err != nil {
 		templates.RenderTemplate(w, "edit", struct {
 			User         *database.User

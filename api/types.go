@@ -1,6 +1,7 @@
 package api
 
 import (
+	"net/http"
 	"time"
 )
 
@@ -23,4 +24,11 @@ type UsersResponse struct {
 
 type ApiError struct {
 	Message string `json:"message"`
+}
+
+func RespondWithError(w http.ResponseWriter, statusCode int, message string) {
+	w.WriteHeader(statusCode)
+	NewIndentEncoder(w).Encode(ApiError{
+		Message: message,
+	})
 }
