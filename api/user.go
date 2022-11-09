@@ -80,10 +80,10 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		RespondWithError(w, http.StatusInternalServerError, "server error")
 		return
 	}
-	dbUser, _ = database.GetStore().UserById(userID)
+
 	user := User{
 		Id:        dbUser.Id,
-		Username:  dbUser.Username,
+		Username:  userIn.Username,
 		CreatedAt: dbUser.CreatedAt,
 		IsAdmin:   dbUser.IsAdmin,
 	}
@@ -106,7 +106,7 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	err = database.GetStore().DeleteUser(userID)
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, "server error")
+		RespondWithError(w, http.StatusInternalServerError, "could not delete a user")
 		return
 	}
 

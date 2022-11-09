@@ -11,13 +11,6 @@ import (
 func UsersHandler(w http.ResponseWriter, r *http.Request) {
 	users, _ := database.GetStore().Users()
 
-	// if true {
-	// 	w.WriteHeader(http.StatusBadRequest)
-	// 	NewIndentEncoder(w).Encode(ApiError{
-	// 		Message: "bad username",
-	// 	})
-	// }
-
 	apiUsers := make([]User, 0, len(users))
 	for _, u := range users {
 		apiUsers = append(apiUsers, User{
@@ -55,7 +48,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	userID, err := database.GetStore().CreateUser(user.Username, user.Password, user.IsAdmin)
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, "server error")
+		RespondWithError(w, http.StatusInternalServerError, "could not create a user")
 		return
 	}
 
