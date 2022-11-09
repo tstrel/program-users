@@ -10,10 +10,22 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func GetUserHandler(w http.ResponseWriter, r *http.Request) {
+func userIdFromReq(r *http.Request) (int64, error) {
 	params := mux.Vars(r)
 	ID := (params["id"])
-	userID, _ := strconv.ParseInt(ID, 10, 64)
+	userID, err := strconv.ParseInt(ID, 10, 64)
+	if err != nil {
+		return -1, err
+	}
+	return userID, nil
+}
+
+func GetUserHandler(w http.ResponseWriter, r *http.Request) {
+	userID, err := userIdFromReq(r)
+	if err != nil {
+		RespondWithError(w, http.StatusBadRequest, "bad request")
+		return
+	}
 
 	dbUser, _ := database.GetStore().UserById(userID)
 	if dbUser == nil {
@@ -33,9 +45,11 @@ func GetUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	ID := (params["id"])
-	userID, _ := strconv.ParseInt(ID, 10, 64)
+	userID, err := userIdFromReq(r)
+	if err != nil {
+		RespondWithError(w, http.StatusBadRequest, "bad request")
+		return
+	}
 
 	dbUser, _ := database.GetStore().UserById(userID)
 	if dbUser == nil {
@@ -44,7 +58,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var userIn UserInput
-	err := json.NewDecoder(r.Body).Decode(&userIn)
+	err = json.NewDecoder(r.Body).Decode(&userIn)
 	if err != nil {
 		RespondWithError(w, http.StatusBadRequest, "could not parse user input")
 		return
@@ -79,16 +93,18 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	ID := (params["id"])
-	userID, _ := strconv.ParseInt(ID, 10, 64)
+	userID, err := userIdFromReq(r)
+	if err != nil {
+		RespondWithError(w, http.StatusBadRequest, "bad request")
+		return
+	}
 
 	dbUser, _ := database.GetStore().UserById(userID)
 	if dbUser == nil {
 		RespondWithError(w, http.StatusNotFound, "no such user")
 		return
 	}
-	err := database.GetStore().DeleteUser(userID)
+	err = database.GetStore().DeleteUser(userID)
 	if err != nil {
 		RespondWithError(w, http.StatusInternalServerError, "server error")
 		return
